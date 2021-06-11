@@ -29,6 +29,13 @@ import zmes_hook_helpers.utils as utils
 import zmes_hook_helpers.common_params as g
 
 
+#==========
+# SETTINGS
+#==========
+
+ALARM_STATE_FILE = '/etc/alarm-watchdog/alarm_state'
+
+
 #======
 # MAIN
 #======
@@ -54,6 +61,10 @@ utils.get_pyzm_config(args)
 g.ctx = ssl.create_default_context()
 utils.process_config(args, g.ctx)
 
+# Read alarm state
+with open(ALARM_STATE_FILE, 'r') as fh:
+  alarm_state = fh.read().strip()
+
 # Connect to ZM API
 api_options = \
   { 'apiurl': g.config['api_portal']
@@ -69,18 +80,26 @@ api_options = \
 g.logger.Info('Connecting with ZM APIs')
 zmapi = zmapi.ZMApi(options=api_options)
 
-# Delete event if no persons have been detected
+# Delete event if no persons have been detected or alarm is inactive
+delete_event = False
 if CAUSE_S.find('detected:person') >= 0:
   g.logger.Info('Event {}: DETECTED person(s)'.format(EVENT_ID))
+  if alarm_state == '1':
+    g.logger.Info('Event {}: Alarm is ACTIVE'.format(EVENT_ID))
+  else:
+    g.logger.Info('Event {}: Alarm is INACTIVE'.format(EVENT_ID))
+    delete_event = True
 else:
   g.logger.Info('Event {}: NO person detected'.format(EVENT_ID))
+  delete_event = True
+if delete_event:
   g.logger.Info('Deleting event {}'.format(EVENT_ID))
   url = '{}/events/{}.json'.format(g.config['api_portal'], EVENT_ID)
   try:
     zmapi._make_request(url=url, type='delete')
   except ValueError as e:
     if str(e) == 'BAD_IMAGE':
-      pass # Ignore
+      pass # This is often received; don't know why so ignore it
     else:
       g.logger.Error ('Error during deletion: {}'.format(str(e)))
       g.logger.Debug(2, traceback.format_exc())

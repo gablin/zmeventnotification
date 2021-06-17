@@ -20,10 +20,11 @@ Arguments:
 '''
 
 import argparse
-import ssl
-import sys
+import datetime
 import pyzm.api as zmapi
 import pyzm.ZMLog as zmlog
+import ssl
+import sys
 import traceback
 import zmes_hook_helpers.utils as utils
 import zmes_hook_helpers.common_params as g
@@ -80,7 +81,9 @@ api_options = \
 g.logger.Info('Connecting with ZM APIs')
 zmapi = zmapi.ZMApi(options=api_options)
 
-# Delete event if no persons have been detected or alarm is inactive
+# Delete event if:
+#   - no persons have been detected, or
+#   - alarm is inactive and not at night time
 delete_event = False
 if CAUSE_S.find('detected:person') >= 0:
   g.logger.Info('Event {}: DETECTED person(s)'.format(EVENT_ID))
@@ -88,7 +91,12 @@ if CAUSE_S.find('detected:person') >= 0:
     g.logger.Info('Event {}: Alarm is ACTIVE'.format(EVENT_ID))
   else:
     g.logger.Info('Event {}: Alarm is INACTIVE'.format(EVENT_ID))
-    delete_event = True
+    now_h = int(datetime.datetime.now().strftime('%H'))
+    if now_h >= 0 and now_h < 6:
+      g.logger.Info('Event {}: AT night time'.format(EVENT_ID))
+    else:
+      g.logger.Info('Event {}: NOT at night time'.format(EVENT_ID))
+      delete_event = True
 else:
   g.logger.Info('Event {}: NO person detected'.format(EVENT_ID))
   delete_event = True

@@ -44,5 +44,11 @@ _RETVAL=1
 if [[ ! -z "${RESULTS}" ]]; then
    _RETVAL=0 
 fi
+
+CHECK_RESULTS=$(/var/lib/zmeventnotification/contrib/check_event_and_cleanup.py ${_RETVAL} $1 $2 '' "${RESULTS}" '' "${EVENT_PATH}" 0 | grep "INTERESTING")
+if [[ -z "${CHECK_RESULTS}" ]]; then
+   _RETVAL=1
+fi
+
 echo ${RESULTS}
 exit ${_RETVAL}

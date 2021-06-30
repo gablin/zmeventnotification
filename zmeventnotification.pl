@@ -4091,6 +4091,7 @@ sub processNewAlarmsInFork {
 
             # This will be prefixed, so no need to add old notes back
             updateEventinZmDB( $eid, $hookString );
+            $notes = $hookString . " " . $notes;
           }
           else {
             printDebug( "DB Event notes contain detection text, all good", 2 );

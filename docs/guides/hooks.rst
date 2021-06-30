@@ -13,6 +13,20 @@ Machine Learning Hooks
         knowledge and familiarity with troubleshooting. I don't plan to
         provide support for these hooks. They are for reference only
 
+
+Key Features 
+~~~~~~~~~~~~~
+
+- Detection: objects, faces 
+- Recognition: faces 
+- Platforms: 
+
+   - CPU (object, face detection, face recognition), 
+   - GPU (object, face detection, face recognition), 
+   - EdgeTPU (object, face detection)
+
+- Machine learning can be installed locally with ZM, or remotely via mlapi 
+
 Limitations
 ~~~~~~~~~~~
 
@@ -31,6 +45,7 @@ recognition.
 
 Please don't ask me questions on how to use them. Please read the
 extensive documentation and ini file configs
+
 
 .. _hooks_install:
 
@@ -274,7 +289,13 @@ When you update to 6.1.0, you may be confused with objectconfig.
 Specifically, which attributes should you use and which ones are ignored?
 It's pretty simple, actually.
 
-- When ``use_sequence`` is set to ``yes`` (default is no), ``ml_options`` and ``stream_sequence``
+.. note::
+
+   use_sequence=no is no longer supported. Please make sure it is set to yes, and follow instructions 
+   on how to set up ml_sequence and stream_sequence correctly 
+
+
+- When ``use_sequence`` is set to ``yes`` (default is yes), ``ml_options`` and ``stream_sequence``
   structures override anything in the ``[object]``, ``[face]`` and ``[alpr]`` sections 
   Specifically, the following values are ignored in objectconfig.ini in favor of values inside the sequence structure:
    
@@ -317,10 +338,10 @@ It's pretty simple, actually.
          use_sequence=yes
 
          [monitor-3]
-         my_sequence='object,face,alpr'
+         my_sequence=object,face,alpr
 
          [monitor-4]
-         my_sequence='object'
+         my_sequence=object
 
          [ml]
          ml_sequence= {
@@ -736,7 +757,7 @@ Troubleshooting
 
 -  In general, I expect you to debug properly. Please don't ask me basic
    questions without investigating logs yourself
--  Always run ``zm_event_start.sh`` in manual mode first to make sure it
+-  Always run ``zm_event_start.sh`` or ``zm_detect.py`` in manual mode first to make sure it
    works
 -  Make sure you've set up debug logging as described in :ref:`es-hooks-logging`
 -  One of the big reasons why object detection fails is because the hook
@@ -764,6 +785,11 @@ Troubleshooting
 
 Debugging and reporting problems
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Reporting Problems:
+
+1. Make sure you have debug logging enabled as described in :ref:`es-hooks-logging`
+2. Don't just post the final error message. Please post _full_ debug logs. 
 
 If you have problems with hooks, there are two areas of failure:
 

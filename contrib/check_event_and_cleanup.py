@@ -39,7 +39,11 @@ def isEventInteresting(cause_s, logger = None):
   with open(ALARM_STATE_FILE, 'r') as fh:
     alarm_state = fh.read().strip()
 
-  if CAUSE_S.find('detected:person') >= 0:
+  if CAUSE_S.find('ALARM') >= 0:
+    if logger:
+      logger.Info('Event {}: ALARM RAISED'.format(EVENT_ID))
+    return True
+  elif CAUSE_S.find('detected:person') >= 0:
     if logger:
       logger.Info('Event {}: DETECTED person(s)'.format(EVENT_ID))
     if alarm_state == '1':

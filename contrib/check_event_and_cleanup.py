@@ -39,18 +39,17 @@ def isEventInteresting(cause_s, logger = None):
   with open(ALARM_STATE_FILE, 'r') as fh:
     alarm_state = fh.read().strip()
 
-  if CAUSE_S.find('ALARM') >= 0:
+  if CAUSE_S.find('Motion') >= 0 and not CAUSE_S.find('ALARM') >= 0:
     if logger:
-      logger.Info('Event {}: ALARM RAISED'.format(EVENT_ID))
+      logger.Info('Event {}: Triggered by MOTION'.format(EVENT_ID))
+  else:
+    if logger:
+      logger.Info('Event {}: NOT triggered by motion'.format(EVENT_ID))
     return True
-  elif CAUSE_S.find('detected:person') >= 0:
+  if CAUSE_S.find('detected:person') >= 0:
     if logger:
       logger.Info('Event {}: DETECTED person(s)'.format(EVENT_ID))
-    if alarm_state == '1':
-      if logger:
-        logger.Info('Event {}: Alarm is ACTIVE'.format(EVENT_ID))
-      return True
-    else:
+    if alarm_state == '0':
       if logger:
         logger.Info('Event {}: Alarm is INACTIVE'.format(EVENT_ID))
       now_h = int(datetime.datetime.now().strftime('%H'))
@@ -61,6 +60,10 @@ def isEventInteresting(cause_s, logger = None):
       else:
         if logger:
           logger.Info('Event {}: NOT at night time'.format(EVENT_ID))
+    else:
+      if logger:
+        logger.Info('Event {}: Alarm is NOT inactive'.format(EVENT_ID))
+      return True
   else:
     if logger:
       logger.Info('Event {}: NO person detected'.format(EVENT_ID))

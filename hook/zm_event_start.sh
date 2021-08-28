@@ -47,7 +47,9 @@ fi
 
 CHECK_RESULTS=$(/var/lib/zmeventnotification/contrib/check_event_and_cleanup.py ${_RETVAL} $1 $2 '' "${REASON} ${RESULTS}" '' "${EVENT_PATH}" 0 | grep "INTERESTING")
 if [[ -z "${CHECK_RESULTS}" ]]; then
-   _RETVAL=1
+  # Note that the "detected" message in the event note will disappear due to
+  # this, but that is okay
+  _RETVAL=1
 fi
 
 echo ${RESULTS}

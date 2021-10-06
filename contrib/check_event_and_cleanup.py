@@ -34,7 +34,7 @@ ALARM_STATE_FILE = '/etc/alarm-watchdog/alarm_state'
 # FUNCTIONS
 #===========
 
-def isEventInteresting(cause_s, logger = None):
+def isEventInteresting(logger = None):
   # Read alarm state
   with open(ALARM_STATE_FILE, 'r') as fh:
     alarm_state = fh.read().strip()
@@ -105,8 +105,7 @@ if __name__ == "__main__":
   utils.get_pyzm_config(args)
   g.ctx = ssl.create_default_context()
   utils.process_config(args, g.ctx)
-
-  if isEventInteresting(CAUSE_S, g.logger):
+  if isEventInteresting(g.logger):
     print('INTERESTING')
   else:
     print('USELESS')

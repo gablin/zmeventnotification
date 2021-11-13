@@ -39,12 +39,20 @@ def isEventInteresting(logger = None):
   with open(ALARM_STATE_FILE, 'r') as fh:
     alarm_state = fh.read().strip()
 
-  if CAUSE_S.find('Motion') >= 0 and not CAUSE_S.find('ALARM') >= 0:
+  if CAUSE_S.find('ALARM') >= 0:
+    if logger:
+      logger.Info('Event {}: Triggered by ALARM'.format(EVENT_ID))
+    return True
+  elif CAUSE_S.find('DOOR BELL') >= 0:
+    if logger:
+      logger.Info('Event {}: Triggered by DOOR BELL'.format(EVENT_ID))
+    return False
+  elif CAUSE_S.find('Motion') >= 0:
     if logger:
       logger.Info('Event {}: Triggered by MOTION'.format(EVENT_ID))
   else:
     if logger:
-      logger.Info('Event {}: NOT triggered by motion'.format(EVENT_ID))
+      logger.Info('Event {}: Triggered by UNKNOWN cause'.format(EVENT_ID))
     return True
   if CAUSE_S.find('detected:person') >= 0:
     if logger:

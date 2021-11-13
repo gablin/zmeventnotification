@@ -27,7 +27,7 @@ import datetime
 # SETTINGS
 #==========
 
-ALARM_STATE_FILE = '/etc/alarm-watchdog/alarm_state'
+ALARM_STATE_FILE = '/etc/alarm-status-server/alarm_state'
 
 
 #===========

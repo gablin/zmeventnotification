@@ -34,50 +34,40 @@ ALARM_STATE_FILE = '/etc/alarm-status-server/alarm_state'
 # FUNCTIONS
 #===========
 
-def isEventInteresting(logger = None):
+def isEventInteresting(logger):
   # Read alarm state
   with open(ALARM_STATE_FILE, 'r') as fh:
     alarm_state = fh.read().strip()
 
   if CAUSE_S.find('ALARM') >= 0:
-    if logger:
-      logger.Info('Event {}: Triggered by ALARM'.format(EVENT_ID))
+    logger.Info('Event {}: Triggered by ALARM'.format(EVENT_ID))
     return True
   elif CAUSE_S.find('DOOR BELL') >= 0:
-    if logger:
-      logger.Info('Event {}: Triggered by DOOR BELL'.format(EVENT_ID))
+    logger.Info('Event {}: Triggered by DOOR BELL'.format(EVENT_ID))
     return False
   elif CAUSE_S.find('Motion') >= 0:
-    if logger:
-      logger.Info('Event {}: Triggered by MOTION'.format(EVENT_ID))
+    logger.Info('Event {}: Triggered by MOTION'.format(EVENT_ID))
   else:
-    if logger:
-      logger.Info('Event {}: Triggered by UNKNOWN cause'.format(EVENT_ID))
+    logger.Info('Event {}: Triggered by UNKNOWN cause'.format(EVENT_ID))
     return True
   if CAUSE_S.find('detected:person') >= 0:
-    if logger:
-      logger.Info('Event {}: DETECTED person(s)'.format(EVENT_ID))
+    logger.Info('Event {}: DETECTED person(s)'.format(EVENT_ID))
     if MONITOR_ID == '8': # Remember to update es_rules.json
       logger.Info('Event {}: ALWAYS KEEP'.format(EVENT_ID))
       return True
     if alarm_state == '0':
-      if logger:
-        logger.Info('Event {}: Alarm is INACTIVE'.format(EVENT_ID))
+      logger.Info('Event {}: Alarm is INACTIVE'.format(EVENT_ID))
       now_h = int(datetime.datetime.now().strftime('%H'))
       if now_h >= 0 and now_h < 6:
-        if logger:
-          logger.Info('Event {}: AT night time'.format(EVENT_ID))
+        logger.Info('Event {}: AT night time'.format(EVENT_ID))
         return True
       else:
-        if logger:
-          logger.Info('Event {}: NOT at night time'.format(EVENT_ID))
+        logger.Info('Event {}: NOT at night time'.format(EVENT_ID))
     else:
-      if logger:
-        logger.Info('Event {}: Alarm is NOT inactive'.format(EVENT_ID))
+      logger.Info('Event {}: Alarm is NOT inactive'.format(EVENT_ID))
       return True
   else:
-    if logger:
-      logger.Info('Event {}: NO person detected'.format(EVENT_ID))
+    logger.Info('Event {}: NO person detected'.format(EVENT_ID))
   return False
 
 

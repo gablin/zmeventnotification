@@ -44,7 +44,7 @@ def isEventInteresting(logger):
     return True
   elif CAUSE_S.find('DOOR BELL') >= 0:
     logger.Info('Event {}: Triggered by DOOR BELL'.format(EVENT_ID))
-    return False
+    return True
   elif CAUSE_S.find('Motion') >= 0:
     logger.Info('Event {}: Triggered by MOTION'.format(EVENT_ID))
   else:

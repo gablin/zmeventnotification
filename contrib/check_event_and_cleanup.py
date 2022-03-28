@@ -50,13 +50,12 @@ def isEventInteresting(logger):
   else:
     logger.Info('Event {}: Triggered by UNKNOWN cause'.format(EVENT_ID))
     return True
+
   if CAUSE_S.find('detected:person') >= 0:
     logger.Info('Event {}: DETECTED person(s)'.format(EVENT_ID))
-    if MONITOR_ID == '8': # Remember to update es_rules.json
-      logger.Info('Event {}: ALWAYS KEEP'.format(EVENT_ID))
-      return True
-    if alarm_state == '0':
-      logger.Info('Event {}: Alarm is INACTIVE'.format(EVENT_ID))
+    if ( alarm_state == '0' or
+         MONITOR_ID == '8' # Front camera, remember to update es_rules.json
+       ):
       now_h = int(datetime.datetime.now().strftime('%H'))
       if now_h >= 0 and now_h < 6:
         logger.Info('Event {}: AT night time'.format(EVENT_ID))

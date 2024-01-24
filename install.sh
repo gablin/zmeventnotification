@@ -151,6 +151,7 @@ verify_config() {
 
     echo
     echo ----------- Configured Values ----------------------------
+    echo "Your distro seems to be ${DISTRO}"
     echo "Your webserver user seems to be ${WEB_OWNER}"
     echo "Your webserver group seems to be ${WEB_GROUP}"
     echo "wget is ${WGET}"
@@ -183,6 +184,16 @@ verify_config() {
 
     fi
     echo
+    if [[ ${INTERACTIVE} == 'no' ]]
+    then
+        echo "Non interactive mode, installer will answer yes to all questions."
+        if [[ ${INSTALLER} == 'apt-get' ]]
+        then
+            INSTALLER="${INSTALLER} -yq"
+        else
+            INSTALLER="${INSTALLER} -y"
+        fi
+    fi
      [[ ${INTERACTIVE} == 'yes' ]] && read -p "If any of this looks wrong, please hit Ctrl+C and edit the variables in this script..."
 
 }
@@ -190,6 +201,16 @@ verify_config() {
 
 # move proc for zmeventnotification.pl
 install_es() {
+    echo '*** Installing ES Dependencies ***'
+    if [[ "$DISTRO" == "ubuntu" || "$DISTRO" == "debian" ]]; then
+      echo "$INSTALLER install libconfig-inifiles-perl libcrypt-mysql-perl libcrypt-eksblowfish-perl libmodule-build-perl libyaml-perl libjson-per liblwp-protocol-https-perl libgeos-devl"
+      $INSTALLER install libconfig-inifiles-perl libcrypt-mysql-perl libcrypt-eksblowfish-perl libmodule-build-perl libyaml-perl
+      echo "$INSTALLER install libnet-websocket-server-perl"
+      $INSTALLER install libnet-websocket-server-perl
+    else
+      echo "Not ubuntu or debian"
+    fi
+
     echo '*** Installing ES ***'
     mkdir -p "${TARGET_DATA}/push" 2>/dev/null
     install -m 755 -o "${WEB_OWNER}" -g "${WEB_GROUP}" zmeventnotification.pl "${TARGET_BIN_ES}" && 
@@ -199,6 +220,12 @@ install_es() {
 
 # install proc for ML hooks
 install_hook() {
+
+    echo "Installing pip..."
+    ${PY_SUDO} ${INSTALLER} install pip
+    echo "Installing python3-opencv..."
+    ${PY_SUDO} ${INSTALLER} install python3-opencv
+
     echo '*** Installing Hooks ***'
     mkdir -p "${TARGET_DATA}/bin" 2>/dev/null
     rm -fr  "${TARGET_DATA}/bin/*" 2>/dev/null
@@ -387,8 +414,12 @@ install_hook() {
  
 
     ZM_DETECT_VERSION=`./hook/zm_detect.py --bareversion`
-    echo "__version__ = \"${ZM_DETECT_VERSION}\"" > hook/zmes_hook_helpers/__init__.py
-    echo "VERSION=__version__" >> hook/zmes_hook_helpers/__init__.py
+    if [ "$ZM_DETECT_VERSION" == "" ]; then
+      echo "Failed to detect hooks version."
+    else
+      echo "__version__ = \"${ZM_DETECT_VERSION}\"" > hook/zmes_hook_helpers/__init__.py
+      echo "VERSION=__version__" >> hook/zmes_hook_helpers/__init__.py
+    fi
 
     ${PY_SUDO} ${PIP} -v install hook/ && print_opencv_message || print_error "python hooks setup failed"
 
@@ -603,19 +634,14 @@ check_args() {
     # same logic as above
     [[ ${INSTALL_HOOK} == 'no' ]] && INSTALL_HOOK_CONFIG='no'
     [[ ${INSTALL_HOOK} == 'prompt' && ${INSTALL_HOOK_CONFIG} == 'yes' ]] && INSTALL_HOOK_CONFIG='prompt'
-
-   
 }
-
 
 ###################################################
 # script main
 ###################################################
-
-
-
 cmd_args=("$@") # because we need a function to access them
 check_args
+DISTRO=$(get_distro)
 check_root
 verify_config
 echo

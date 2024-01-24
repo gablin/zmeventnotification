@@ -30,7 +30,7 @@ To clone the latest stable release:
 
 ::
 
-  git clone https://github.com/pliablepixels/zmeventnotification.git
+  git clone https://github.com/zoneminder/zmeventnotification.git
   cd zmeventnotification
   # repeat these two steps each time you want to update to the latest stable
   git fetch --tags
@@ -41,7 +41,7 @@ To clone master:
 
 ::
 
-  git clone https://github.com/pliablepixels/zmeventnotification.git
+  git clone https://github.com/zoneminder/zmeventnotification.git
   # repeat these two steps each time you want to update
   git checkout master # only needed if you are on some other branch later
   git pull
@@ -77,7 +77,7 @@ whilst inside the shell, ``install Module::Name``)
 -  ``Net::WebSocket::Server``
 -  ``Config::IniFiles`` (you may already have this installed)
 -  ``Crypt::Eksblowfish::Bcrypt`` (if you have updated to ZM 1.34, you will already have this)
-- ``Time::Piece`` for parsing ES rules
+-  ``Time::Piece`` for parsing ES rules
 
 Installing these dependencies is as simple as:
 
@@ -116,8 +116,9 @@ Next up install WebSockets
 
 ::
 
-    sudo apt-get install libyaml-perl
-    sudo apt-get install make
+    sudo apt install libyaml-perl
+    sudo apt install make
+    sudo apt install libprotocol-websocket-perl
     sudo perl -MCPAN -e "install Net::WebSocket::Server"
 
 Then, you need JSON.pm installed. It's there on some systems and not on
@@ -130,6 +131,10 @@ others In ubuntu, do this to install JSON:
 Get HTTPS library for LWP:
 
 ::
+
+    sudo apt-get install liblwp-protocol-https-perl
+
+    or 
 
     perl -MCPAN -e "install LWP::Protocol::https"
 
